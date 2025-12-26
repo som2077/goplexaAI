@@ -275,20 +275,7 @@ const Maincard = () => {
                 >
                   GitHub
                 </DropdownMenuItem>
-                {/* // Feedback */}
-                <DropdownMenuItem
-                  className="text-white hover:bg-white/10 cursor-pointer"
-                  onClick={() => {
-                    if (window.require) {
-                      const { shell } = window.require("electron");
-                      shell.openExternal(
-                        "https://github.com/yourusername/gopelxa/issues"
-                      );
-                    }
-                  }}
-                >
-                  Feedback
-                </DropdownMenuItem>
+
                 {/* // Visit Website */}
                 <DropdownMenuItem
                   className="text-white hover:bg-white/10 cursor-pointer"
