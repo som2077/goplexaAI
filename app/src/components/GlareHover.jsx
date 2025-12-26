@@ -3,7 +3,7 @@ import { useRef } from 'react';
 const GlareHover = ({
   width = "full",
   height = "full",
-  background = '#000',
+  background = 'transparent',
   borderRadius = '10px',
   borderColor = 'rgba(255, 255, 255, 0.1)',
   children,
