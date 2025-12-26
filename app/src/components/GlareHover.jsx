@@ -5,7 +5,7 @@ const GlareHover = ({
   height = "full",
   background = 'transparent',
   borderRadius = '10px',
-  borderColor = 'rgba(255, 255, 255, 0.1)',
+  borderColor = 'rgba(255, 255, 255, 0.07)',
   children,
   glareColor = '#ffffff',
   glareOpacity = 0.5,

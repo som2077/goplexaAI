@@ -192,7 +192,7 @@ const Maincard = () => {
                   Profile
                 </DropdownMenuLabel>
 
-                <GlareHover className=" mx-[5px] ">
+                <GlareHover className=" mx-[5px]  ">
                   <div className="select-none gap-2  z-1 p-2 flex items-center justify-between bg-black/30 ">
                     <div className="flex items-center ">
                       <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-900 to-blue-500 flex items-center justify-center border border-white/20">
@@ -217,7 +217,7 @@ const Maincard = () => {
                   Keyboard Movement
                 </DropdownMenuLabel>
 
-                <div className="bg-black/30 rounded-[10px] mx-[5px] p-1 mb-2 ">
+                <div className="bg-black/30 border border-white/[0.07] rounded-[10px] mx-[5px] p-1 mb-2 ">
                   {/* Window Control */}
                   <DropdownMenuLabel
                     className="text-white flex items-center justify-between select-none"
