@@ -35,6 +35,28 @@ const WEB_PREFERENCES = {
   devTools: true,
 };
 
+// Global reference to TopBar window instance
+let topBarInstance = null;
+
+// =============================================================================
+// GLOBAL ALWAYS ON TOP ENFORCER
+// =============================================================================
+function enforceAlwaysOnTop() {
+  if (
+    topBarInstance &&
+    topBarInstance.window &&
+    !topBarInstance.window.isDestroyed()
+  ) {
+    topBarInstance.window.setAlwaysOnTop(true, "screen-saver", 1);
+    topBarInstance.window.setVisibleOnAllWorkspaces(true, {
+      visibleOnFullScreen: true,
+    });
+  }
+}
+
+// Set up interval to enforce always on top every second
+setInterval(enforceAlwaysOnTop, 1000);
+
 // =============================================================================
 // TOP BAR WINDOW CLASS
 // =============================================================================
@@ -50,6 +72,9 @@ class TopBarWindow {
     this.iconPath = iconPath;
     this.getViteURL = getViteURL;
     this.bottomCardWindow = bottomCardWindow;
+
+    // Set global instance reference
+    topBarInstance = this;
 
     // Initialize IPC handlers
     this.setupIpcHandlers();
@@ -71,10 +96,17 @@ class TopBarWindow {
       const windowOptions = this.calculateWindowOptions();
       this.window = new BrowserWindow(windowOptions);
 
+      // Set always on top with maximum level and force it to stay on all workspaces
+      this.window.setAlwaysOnTop(true, "screen-saver", 1);
+      this.window.setVisibleOnAllWorkspaces(true, {
+        visibleOnFullScreen: true,
+      });
+
       this.setupWindowEvents();
       this.loadWindowContent();
 
       console.log("✅ TopBar window created successfully");
+      console.log("🔝 Always on top: enabled (GLOBAL MODE)");
     } catch (error) {
       console.error("❌ Error creating TopBar window:", error);
     }
@@ -134,7 +166,7 @@ class TopBarWindow {
 
     // Window lifecycle events
     this.setupWindowLifecycleEvents();
-    
+
     // Keyboard movement events
     this.setupKeyboardMovement();
   }
@@ -146,6 +178,7 @@ class TopBarWindow {
     this.window.on("closed", () => {
       console.log("🔒 TopBar window closed");
       this.window = null;
+      topBarInstance = null;
 
       // Close BottomCard window when TopBar is closed
       if (this.bottomCardWindow) {
@@ -154,6 +187,34 @@ class TopBarWindow {
       } else {
         console.log("⚠️  BottomCard window reference not available");
       }
+    });
+
+    // Aggressively enforce always on top on every event
+    this.window.on("show", () => {
+      this.window.setAlwaysOnTop(true, "screen-saver", 1);
+      this.window.setVisibleOnAllWorkspaces(true, {
+        visibleOnFullScreen: true,
+      });
+    });
+
+    this.window.on("blur", () => {
+      this.window.setAlwaysOnTop(true, "screen-saver", 1);
+      this.window.setVisibleOnAllWorkspaces(true, {
+        visibleOnFullScreen: true,
+      });
+    });
+
+    this.window.on("focus", () => {
+      this.window.setAlwaysOnTop(true, "screen-saver", 1);
+    });
+
+    this.window.on("restore", () => {
+      this.window.setAlwaysOnTop(true, "screen-saver", 1);
+    });
+
+    // Monitor all window changes
+    this.window.on("move", () => {
+      this.window.setAlwaysOnTop(true, "screen-saver", 1);
     });
   }
 
@@ -166,14 +227,19 @@ class TopBarWindow {
     this.window.webContents.on("before-input-event", (event, input) => {
       // Only handle arrow keys when the window is focused
       if (!this.window.isFocused()) return;
-      
+
       // Check if it's a left or right arrow key
-      if (input.type === "keyDown" && (input.key === "ArrowLeft" || input.key === "ArrowRight")) {
+      if (
+        input.type === "keyDown" &&
+        (input.key === "ArrowLeft" || input.key === "ArrowRight")
+      ) {
         event.preventDefault(); // Prevent default browser behavior
-        
+
         // Determine movement step (fast if Shift is held)
-        const moveStep = input.shift ? WINDOW_CONFIG.keyboardMoveFastStep : WINDOW_CONFIG.keyboardMoveStep;
-        
+        const moveStep = input.shift
+          ? WINDOW_CONFIG.keyboardMoveFastStep
+          : WINDOW_CONFIG.keyboardMoveStep;
+
         // Handle left and right arrow keys
         if (input.key === "ArrowLeft") {
           this.moveTopBarLeft(moveStep);
@@ -182,7 +248,7 @@ class TopBarWindow {
         }
       }
     });
-    
+
     console.log("⌨️  Keyboard movement handlers setup for TopBar");
   }
 
@@ -211,6 +277,9 @@ class TopBarWindow {
     // Movement handlers
     this.setupMovementHandlers();
 
+    // Always on top handler
+    this.setupAlwaysOnTopHandler();
+
     console.log("✅ TopBar IPC handlers registered");
   }
 
@@ -228,6 +297,19 @@ class TopBarWindow {
     ipcMain.on("close-topbar", () => {
       console.log("❌ Closing TopBar window (Exit Application clicked)");
       this.handleExitApplication();
+    });
+  }
+
+  /**
+   * Setup always on top IPC handler
+   */
+  setupAlwaysOnTopHandler() {
+    ipcMain.on("set-always-on-top", (event, flag) => {
+      console.log(`🔝 Setting always on top: ${flag}`);
+      this.safeWindowOperation((win) => {
+        win.setAlwaysOnTop(flag, "screen-saver", 1);
+        win.setVisibleOnAllWorkspaces(flag, { visibleOnFullScreen: true });
+      });
     });
   }
 
@@ -279,22 +361,38 @@ class TopBarWindow {
 
       console.log(`🖥️ Display info:`);
       console.log(`   - Full screen size: ${screenWidth}x${screenHeight}`);
-      console.log(`   - Work area size: ${workAreaWidth}x${display.workAreaSize.height}`);
+      console.log(
+        `   - Work area size: ${workAreaWidth}x${display.workAreaSize.height}`
+      );
       console.log(`   - Window width: ${windowWidth}`);
       console.log(`   - Desired X: ${x}`);
 
       // Try using work area width if it's different and might be the issue
-      const effectiveScreenWidth = workAreaWidth !== screenWidth ? workAreaWidth : screenWidth;
+      const effectiveScreenWidth =
+        workAreaWidth !== screenWidth ? workAreaWidth : screenWidth;
       console.log(`🎯 Using effective screen width: ${effectiveScreenWidth}`);
 
       // Constrain X position to screen boundaries
-      let constrainedX = this.constrainXPosition(x, effectiveScreenWidth, windowWidth);
+      let constrainedX = this.constrainXPosition(
+        x,
+        effectiveScreenWidth,
+        windowWidth
+      );
 
       // Set position with constraints
       win.setPosition(constrainedX, topBarY);
 
+      // Re-enforce always on top after movement
+      win.setAlwaysOnTop(true, "screen-saver", 1);
+
       console.log(`📍 TopBar moved to: (${constrainedX}, ${topBarY})`);
-      console.log(`🔍 Right edge check: ${constrainedX + windowWidth} <= ${effectiveScreenWidth} (${constrainedX + windowWidth <= effectiveScreenWidth})`);
+      console.log(
+        `🔍 Right edge check: ${
+          constrainedX + windowWidth
+        } <= ${effectiveScreenWidth} (${
+          constrainedX + windowWidth <= effectiveScreenWidth
+        })`
+      );
     });
   }
 
@@ -308,7 +406,9 @@ class TopBarWindow {
   constrainXPosition(x, screenWidth, windowWidth) {
     let constrainedX = x;
 
-    console.log(`🔍 Constraint check - Input: x=${x}, screenWidth=${screenWidth}, windowWidth=${windowWidth}`);
+    console.log(
+      `🔍 Constraint check - Input: x=${x}, screenWidth=${screenWidth}, windowWidth=${windowWidth}`
+    );
 
     // Ensure window doesn't go off the left edge
     if (constrainedX < 0) {
@@ -319,11 +419,19 @@ class TopBarWindow {
     // Ensure window doesn't go off the right edge - allow it to reach the very edge
     if (constrainedX + windowWidth > screenWidth) {
       const newX = screenWidth - windowWidth;
-      console.log(`➡️ Right constraint applied: ${constrainedX} -> ${newX} (right edge: ${newX + windowWidth})`);
+      console.log(
+        `➡️ Right constraint applied: ${constrainedX} -> ${newX} (right edge: ${
+          newX + windowWidth
+        })`
+      );
       constrainedX = newX;
     }
 
-    console.log(`✅ Final constrained X: ${constrainedX}, right edge: ${constrainedX + windowWidth}`);
+    console.log(
+      `✅ Final constrained X: ${constrainedX}, right edge: ${
+        constrainedX + windowWidth
+      }`
+    );
     return constrainedX;
   }
 
@@ -359,6 +467,11 @@ class TopBarWindow {
     if (this.window) {
       this.window.show();
       this.window.focus();
+      // Ensure always on top when showing
+      this.window.setAlwaysOnTop(true, "screen-saver", 1);
+      this.window.setVisibleOnAllWorkspaces(true, {
+        visibleOnFullScreen: true,
+      });
     } else {
       this.createWindow();
     }
@@ -398,6 +511,8 @@ class TopBarWindow {
   setPosition(x, y) {
     if (this.window) {
       this.window.setPosition(x, y);
+      // Re-enforce always on top after position change
+      this.window.setAlwaysOnTop(true, "screen-saver", 1);
     }
   }
 
@@ -424,9 +539,10 @@ class TopBarWindow {
     if (this.window && !this.window.isDestroyed()) {
       const [currentX, currentY] = this.window.getPosition();
       const newX = Math.max(0, currentX - step); // Don't go below 0
-      
+
       if (newX !== currentX) {
         this.window.setPosition(newX, currentY);
+        this.window.setAlwaysOnTop(true, "screen-saver", 1);
         console.log(`⬅️  TopBar moved left to: (${newX}, ${currentY})`);
       }
     }
@@ -442,12 +558,13 @@ class TopBarWindow {
       const [windowWidth, windowHeight] = this.window.getSize();
       const display = screen.getPrimaryDisplay();
       const { width: screenWidth } = display.size;
-      
+
       const maxX = screenWidth - windowWidth;
       const newX = Math.min(maxX, currentX + step);
-      
+
       if (newX !== currentX) {
         this.window.setPosition(newX, currentY);
+        this.window.setAlwaysOnTop(true, "screen-saver", 1);
         console.log(`➡️  TopBar moved right to: (${newX}, ${currentY})`);
       }
     }
@@ -467,6 +584,7 @@ class TopBarWindow {
 
         const position = this.calculateInitialPosition();
         this.window.setPosition(position.x, position.y);
+        this.window.setAlwaysOnTop(true, "screen-saver", 1);
 
         this.logInitialState();
       } catch (error) {
@@ -484,9 +602,7 @@ class TopBarWindow {
     const { width: screenWidth } = display.size; // Use full screen size
 
     // Calculate center position with boundary constraints
-    let topBarCenterX = Math.round(
-      (screenWidth - WINDOW_CONFIG.width) / 2
-    );
+    let topBarCenterX = Math.round((screenWidth - WINDOW_CONFIG.width) / 2);
     topBarCenterX = Math.max(
       0, // Allow to reach left edge
       Math.min(
@@ -507,6 +623,7 @@ class TopBarWindow {
   logInitialState() {
     console.log("🎯 === INITIAL STATE ===");
     console.log("✅ TopBar: Visible and centered");
+    console.log("🔝 Always on Top: GLOBALLY ENFORCED");
     console.log("👁️  BottomCard: Hidden (will show on expand button click)");
   }
 
@@ -531,6 +648,11 @@ class TopBarWindow {
     if (this.window && !this.window.isDestroyed()) {
       console.log("📸 Showing TopBar after screenshot");
       this.window.show();
+      // Re-apply always on top after screenshot
+      this.window.setAlwaysOnTop(true, "screen-saver", 1);
+      this.window.setVisibleOnAllWorkspaces(true, {
+        visibleOnFullScreen: true,
+      });
     }
   }
 }
