@@ -49,7 +49,7 @@ const New = () => {
         ${
           isCapturing
             ? "bg-blue-500 text-white cursor-wait"
-            : "bg-[#121212] text-white hover:bg-[#ffffff] hover:text-black"
+            : "bg-[#121212]/80 text-white hover:bg-[#ffffff] hover:text-black"
         } 
         rounded-full text-sm transition-all duration-200
         disabled:opacity-50 disabled:cursor-wait

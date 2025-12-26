@@ -157,7 +157,7 @@ const Maincard = () => {
         </div>
 
         {/* Audio waveform component container */}
-        <div className="flex items-center ml-2 bg-[#121212] rounded-full focus:outline-none focus:ring-0 active:outline-none transition">
+        <div className="flex items-center ml-2 bg-[#121212]/80 rounded-full focus:outline-none focus:ring-0 active:outline-none transition">
           <AudioWaveform />
         </div>
 
