@@ -199,8 +199,8 @@ const Maincard = () => {
                 >
                   <span>Show/Hide</span>
                   <div className="ml-2 flex gap-1">
-                    <Kbd>Ctrl</Kbd>
-                    <Kbd>/</Kbd>
+                    <Kbd className="bg-white text-black">Ctrl</Kbd>
+                    <Kbd className="bg-white text-black">/</Kbd>
                   </div>
                 </DropdownMenuLabel>
 
@@ -215,11 +215,11 @@ const Maincard = () => {
                 <DropdownMenuLabel className="text-white flex items-center justify-between select-none">
                   <span>Fast Move</span>
                   <div className="ml-2 flex gap-1">
-                    <Kbd>Shift</Kbd>
-                    <Kbd>↑</Kbd>
-                    <Kbd>↓</Kbd>
-                    <Kbd>←</Kbd>
-                    <Kbd>→</Kbd>
+                    <Kbd className="bg-white text-black">Shift</Kbd>
+                    <Kbd className="bg-white text-black">↑</Kbd>
+                    <Kbd className="bg-white text-black">↓</Kbd>
+                    <Kbd className="bg-white text-black">←</Kbd>
+                    <Kbd className="bg-white text-black">→</Kbd>
                   </div>
                 </DropdownMenuLabel>
 
@@ -227,10 +227,10 @@ const Maincard = () => {
                 <DropdownMenuLabel className="text-white flex items-center justify-between select-none">
                   <span>Move</span>
                   <div className="ml-2 flex gap-1">
-                    <Kbd>↑</Kbd>
-                    <Kbd>↓</Kbd>
-                    <Kbd>←</Kbd>
-                    <Kbd>→</Kbd>
+                    <Kbd className="bg-white text-black">↑</Kbd>
+                    <Kbd className="bg-white text-black">↓</Kbd>
+                    <Kbd className="bg-white text-black">←</Kbd>
+                    <Kbd className="bg-white text-black">→</Kbd>
                   </div>
                 </DropdownMenuLabel>
 
