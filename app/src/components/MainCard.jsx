@@ -5,6 +5,7 @@
 // It manages window dragging, settings, and navigation to content analysis
 
 import React, { useEffect, useRef, useState } from "react";
+import GlareHover from "./GlareHover";
 import New from "../features/New";
 import AudioWaveform from "../features/AudioWaveform";
 import moreWhiteIcon from "../assets/more_white.svg";
@@ -178,63 +179,88 @@ const Maincard = () => {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-60 bg-[#0f0f0f] border-white/20 text-white mt-4 "
+                className="bg-[#0f0f0f] border-white/20 text-white mt-5 w-[274px]  "
                 align="end"
                 sideOffset={5}
               >
                 <DropdownMenuLabel className="text-white font-semibold select-none">
                   My Account
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-white/20" />
-                {/* Window Control */}
-                <DropdownMenuLabel
-                  className="text-white flex items-center justify-between select-none"
-                  onClick={() => {
-                    // Toggle window visibility
-                    if (window.require) {
-                      const { ipcRenderer } = window.require("electron");
-                      ipcRenderer.send("toggle-bottomcard");
-                    }
-                  }}
-                >
-                  <span>Show/Hide</span>
-                  <div className="ml-2 flex gap-1">
-                    <Kbd className="bg-white text-black">Ctrl</Kbd>
-                    <Kbd className="bg-white text-black">/</Kbd>
-                  </div>
+                <DropdownMenuSeparator className="bg-white/20 mx-[1px]" />
+
+                <DropdownMenuLabel className="text-white text-xs font-semibold select-none">
+                  Profile
                 </DropdownMenuLabel>
 
-                <DropdownMenuSeparator className="bg-white/20" />
+                <GlareHover className="mx-[5px] ">
+                  <div className=" bg-black select-none gap-2  z-1 p-2 flex items-center justify-between">
+                    <div className="flex items-center ">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-900 to-blue-500 flex items-center justify-center border border-white/20">
+                        <svg
+                          className="w-10 h-10 text-white"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <span className="text-xs">somgoutam0@gmail.com</span>
+                    <button className="bg-white hover:bg-gray-200 text-black text-xs font-semibold py-1 cursor-pointer px-[10px] rounded-full">
+                      Show
+                    </button>
+                  </div>
+                </GlareHover>
 
                 {/* Keyboard Movement Instructions */}
-                <DropdownMenuLabel className="text-white font-semibold select-none">
+                <DropdownMenuLabel className="text-white text-xs font-semibold select-none">
                   Keyboard Movement
                 </DropdownMenuLabel>
 
-                {/* Fast Move with Shift + Arrow Keys */}
-                <DropdownMenuLabel className="text-white flex items-center justify-between select-none">
-                  <span>Fast Move</span>
-                  <div className="ml-2 flex gap-1">
-                    <Kbd className="bg-white text-black">Shift</Kbd>
-                    <Kbd className="bg-white text-black">↑</Kbd>
-                    <Kbd className="bg-white text-black">↓</Kbd>
-                    <Kbd className="bg-white text-black">←</Kbd>
-                    <Kbd className="bg-white text-black">→</Kbd>
-                  </div>
-                </DropdownMenuLabel>
+                <div className=" bg-black  rounded-[10px] mx-[5px] p-1 mb-2 ">
+                  {/* Window Control */}
+                  <DropdownMenuLabel
+                    className="text-white flex items-center justify-between select-none"
+                    onClick={() => {
+                      // Toggle window visibility
+                      if (window.require) {
+                        const { ipcRenderer } = window.require("electron");
+                        ipcRenderer.send("toggle-bottomcard");
+                      }
+                    }}
+                  >
+                    <span className="text-xs">Show/Hide</span>
+                    <div className="ml-2 flex gap-1">
+                      <Kbd className="bg-white text-black">Ctrl</Kbd>
+                      <Kbd className="bg-white text-black">/</Kbd>
+                    </div>
+                  </DropdownMenuLabel>
 
-                {/* Normal Move with Arrow Keys */}
-                <DropdownMenuLabel className="text-white flex items-center justify-between select-none">
-                  <span>Move</span>
-                  <div className="ml-2 flex gap-1">
-                    <Kbd className="bg-white text-black">↑</Kbd>
-                    <Kbd className="bg-white text-black">↓</Kbd>
-                    <Kbd className="bg-white text-black">←</Kbd>
-                    <Kbd className="bg-white text-black">→</Kbd>
-                  </div>
-                </DropdownMenuLabel>
+                  {/* Normal Move with Arrow Keys */}
+                  <DropdownMenuLabel className="text-white flex items-center justify-between select-none">
+                    <span className="text-xs">Move</span>
+                    <div className="ml-2 flex gap-1">
+                      <Kbd className="bg-white text-black">↑</Kbd>
+                      <Kbd className="bg-white text-black">↓</Kbd>
+                      <Kbd className="bg-white text-black">←</Kbd>
+                      <Kbd className="bg-white text-black">→</Kbd>
+                    </div>
+                  </DropdownMenuLabel>
 
-                <DropdownMenuSeparator className="bg-white/20" />
+                  {/* Fast Move with Shift + Arrow Keys */}
+                  <DropdownMenuLabel className="text-white flex items-center justify-between select-none">
+                    <span className="text-xs">Fast Move</span>
+                    <div className="ml-2 flex gap-1">
+                      <Kbd className="bg-white text-black">Shift</Kbd>
+                      <Kbd className="bg-white text-black">↑</Kbd>
+                      <Kbd className="bg-white text-black">↓</Kbd>
+                      <Kbd className="bg-white text-black">←</Kbd>
+                      <Kbd className="bg-white text-black">→</Kbd>
+                    </div>
+                  </DropdownMenuLabel>
+                </div>
+
+                <DropdownMenuSeparator className="bg-white/20 mx-[1px]" />
                 {/* // GitHub */}
                 <DropdownMenuItem
                   className="text-white hover:bg-white/10 cursor-pointer"
