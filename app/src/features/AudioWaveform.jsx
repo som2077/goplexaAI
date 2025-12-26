@@ -13,7 +13,6 @@ const AudioWaveform = () => {
   const smoothedHeightsRef = useRef(Array(13).fill(0));
   const [error, setError] = useState(null);
 
-  // Start microphone capture
   const startListening = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -43,7 +42,6 @@ const AudioWaveform = () => {
     }
   };
 
-  // Stop microphone and cleanup
   const stopListening = () => {
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
@@ -61,7 +59,6 @@ const AudioWaveform = () => {
     smoothedHeightsRef.current = Array(13).fill(0);
   };
 
-  // Analyze audio and create symmetric wave pattern
   const analyzeAudio = () => {
     const bufferLength = analyserRef.current.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
@@ -71,10 +68,10 @@ const AudioWaveform = () => {
     const detectFrequencies = () => {
       analyserRef.current.getByteFrequencyData(dataArray);
 
-      // Get different frequency ranges for variety
       const barWidth = Math.floor(bufferLength / (numBars / 2 + 1));
       const newHeights = [];
 
+      // Calculate heights for each bar based on actual audio frequencies
       for (let i = 0; i <= centerIndex; i++) {
         const start = i * barWidth;
         const end = start + barWidth;
@@ -86,19 +83,19 @@ const AudioWaveform = () => {
         const average = sum / barWidth;
         const normalized = average / 255;
 
-        // Apply smoothing
-        const easingFactor = 0.25;
+        // Smooth transitions
+        const easingFactor = 0.3;
         smoothedHeightsRef.current[i] +=
           (normalized - smoothedHeightsRef.current[i]) * easingFactor;
 
         newHeights.push(smoothedHeightsRef.current[i]);
       }
 
-      // Create symmetric pattern: left side, center, right side (mirror)
+      // Create symmetric pattern
       const symmetricHeights = [
-        ...newHeights.slice(1).reverse(), // Left side (excluding center)
-        newHeights[0], // Center bar
-        ...newHeights.slice(1), // Right side
+        ...newHeights.slice(1).reverse(),
+        newHeights[0],
+        ...newHeights.slice(1),
       ];
 
       setBarHeights(symmetricHeights);
@@ -108,7 +105,6 @@ const AudioWaveform = () => {
     detectFrequencies();
   };
 
-  // Toggle recording
   const toggleRecording = () => {
     if (isRecording) {
       stopListening();
@@ -123,18 +119,18 @@ const AudioWaveform = () => {
 
   return (
     <div className="audio-waveform-container select-none">
-      {/* Static centered soundwave */}
-      <div className="flex items-center justify-center gap-1 ml-[20px] select-none">
+      {/* Waveform bars with constrained height */}
+      <div className="flex items-center justify-center gap-1 ml-[20px] select-none h-[60px]">
         {barHeights.map((height, index) => {
           const centerIndex = Math.floor(barHeights.length / 2);
           const distanceFromCenter = Math.abs(index - centerIndex);
 
-          // Center bar is tallest, others gradually smaller
-          const heightMultiplier = 1 - distanceFromCenter * 0.15;
-          const barHeight = 7 + height * 60 * heightMultiplier;
+          // Min height 7px, max height 40px (stays within 60px container)
+          const minHeight = 7;
+          const maxHeight = 40;
+          const barHeight = minHeight + height * (maxHeight - minHeight);
 
-          // Center bar is brightest
-          const opacity = 1 - distanceFromCenter * 0.1;
+          const opacity = 0.8 - distanceFromCenter * 0.1;
 
           return (
             <motion.div
@@ -143,18 +139,12 @@ const AudioWaveform = () => {
               style={{
                 width: "4px",
                 opacity: opacity,
-                // boxShadow:
-                //   height > 0.1
-                //     ? `0 0 ${height * 10}px rgba(255, 255, 255, ${
-                //         height * 0.7
-                //       })`
-                //     : "none",
               }}
               animate={{
                 height: `${barHeight}px`,
               }}
               transition={{
-                duration: 0.075,
+                duration: 0.01,
                 ease: "easeOut",
               }}
             />
@@ -195,7 +185,6 @@ const AudioWaveform = () => {
         )}
       </button>
 
-      {/* Error message */}
       {error && <div className="text-xs text-red-400">{error}</div>}
     </div>
   );
