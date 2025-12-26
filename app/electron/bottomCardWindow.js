@@ -13,7 +13,6 @@
 // IMPORTS & DEPENDENCIES
 // =============================================================================
 import { BrowserWindow, screen, ipcMain } from "electron";
-import path from "path";
 import fs from "fs";
 
 // =============================================================================
@@ -24,9 +23,6 @@ const WINDOW_CONFIG = {
   height: 724,
   minWidth: 400,
   minHeight: 300,
-  topBarHeight: 150,
-  topBarY: 0,
-  gapBelowTopBar: 10,
   screenMargin: 40,
   boundaryMargin: 20,
   moveThrottleDelay: 50,
@@ -66,10 +62,10 @@ class BottomCardWindow {
     this.getViteURL = getViteURL;
     this.vitePort = vitePort;
     this.lastScreenshotPath = null;
-    
+
     // Initialize IPC handlers
     this.setupIpcHandlers();
-    
+
     console.log("✅ BottomCardWindow initialized");
   }
 
@@ -83,13 +79,13 @@ class BottomCardWindow {
   createWindow() {
     try {
       console.log("🚀 Creating BottomCard window...");
-      
+
       const windowOptions = this.calculateWindowOptions();
       this.window = new BrowserWindow(windowOptions);
-      
+
       this.setupWindowEvents();
       this.loadWindowContent();
-      
+
       console.log("✅ BottomCard window created successfully");
     } catch (error) {
       console.error("❌ Error creating BottomCard window:", error);
@@ -103,14 +99,25 @@ class BottomCardWindow {
   calculateWindowOptions() {
     const display = screen.getPrimaryDisplay();
     const { width: screenWidth, height: screenHeight } = display.workAreaSize;
-    
+
     // Calculate safe dimensions
-    const maxWindowWidth = Math.min(WINDOW_CONFIG.width, screenWidth - WINDOW_CONFIG.screenMargin);
-    const maxWindowHeight = Math.min(WINDOW_CONFIG.height, screenHeight - WINDOW_CONFIG.screenMargin);
-    
+    const maxWindowWidth = Math.min(
+      WINDOW_CONFIG.width,
+      screenWidth - WINDOW_CONFIG.screenMargin,
+    );
+    const maxWindowHeight = Math.min(
+      WINDOW_CONFIG.height,
+      screenHeight - WINDOW_CONFIG.screenMargin,
+    );
+
     // Calculate initial positioning
-    const position = this.calculateWindowPosition(screenWidth, screenHeight, maxWindowWidth, maxWindowHeight);
-    
+    const position = this.calculateWindowPosition(
+      screenWidth,
+      screenHeight,
+      maxWindowWidth,
+      maxWindowHeight,
+    );
+
     return {
       width: maxWindowWidth,
       height: maxWindowHeight,
@@ -144,22 +151,33 @@ class BottomCardWindow {
    * @param {number} windowHeight - Window height
    * @returns {Object} Position coordinates {x, y}
    */
-  calculateWindowPosition(screenWidth, screenHeight, windowWidth, windowHeight) {
+  calculateWindowPosition(
+    screenWidth,
+    screenHeight,
+    windowWidth,
+    windowHeight,
+  ) {
     // Calculate center position
     const centerX = Math.round((screenWidth - windowWidth) / 2);
     const centerY = Math.round((screenHeight - windowHeight) / 2);
-    
+
     // Boundary enforcement to ensure window stays within screen bounds
     const finalX = Math.max(
       WINDOW_CONFIG.boundaryMargin,
-      Math.min(centerX, screenWidth - windowWidth - WINDOW_CONFIG.boundaryMargin)
+      Math.min(
+        centerX,
+        screenWidth - windowWidth - WINDOW_CONFIG.boundaryMargin,
+      ),
     );
-    
+
     const finalY = Math.max(
       WINDOW_CONFIG.boundaryMargin,
-      Math.min(centerY, screenHeight - windowHeight - WINDOW_CONFIG.boundaryMargin)
+      Math.min(
+        centerY,
+        screenHeight - windowHeight - WINDOW_CONFIG.boundaryMargin,
+      ),
     );
-    
+
     console.log(`🎯 Centering BottomCard window at: (${finalX}, ${finalY})`);
     return { x: finalX, y: finalY };
   }
@@ -175,13 +193,13 @@ class BottomCardWindow {
 
     // Page load events
     this.setupPageLoadEvents();
-    
+
     // Window lifecycle events
     this.setupWindowLifecycleEvents();
-    
+
     // Movement optimization
     this.setupMovementOptimization();
-    
+
     // Keyboard movement events
     this.setupKeyboardMovement();
   }
@@ -196,18 +214,21 @@ class BottomCardWindow {
       console.log("🔗 BottomCard loaded URL:", currentURL);
     });
 
-    this.window.webContents.on("did-fail-load", (event, errorCode, errorDescription, validatedURL) => {
-      console.error("❌ BottomCard page failed to load:");
-      console.error(`  Code: ${errorCode}`);
-      console.error(`  Description: ${errorDescription}`);
-      console.error(`  URL: ${validatedURL}`);
-    });
+    this.window.webContents.on(
+      "did-fail-load",
+      (_event, errorCode, errorDescription, validatedURL) => {
+        console.error("❌ BottomCard page failed to load:");
+        console.error(`  Code: ${errorCode}`);
+        console.error(`  Description: ${errorDescription}`);
+        console.error(`  URL: ${validatedURL}`);
+      },
+    );
 
-    this.window.webContents.on("did-navigate", (event, url) => {
+    this.window.webContents.on("did-navigate", (_event, url) => {
       console.log("🧭 BottomCard navigated to:", url);
     });
 
-    this.window.webContents.on("did-navigate-in-page", (event, url) => {
+    this.window.webContents.on("did-navigate-in-page", (_event, url) => {
       console.log("🔗 BottomCard navigated in page to:", url);
     });
 
@@ -255,14 +276,16 @@ class BottomCardWindow {
     this.window.webContents.on("before-input-event", (event, input) => {
       // Only handle arrow keys when the window is focused
       if (!this.window.isFocused()) return;
-      
+
       // Check if it's an arrow key
       if (input.type === "keyDown" && input.key.startsWith("Arrow")) {
         event.preventDefault(); // Prevent default browser behavior
-        
+
         // Determine movement step (fast if Shift is held)
-        const moveStep = input.shift ? WINDOW_CONFIG.keyboardMoveFastStep : WINDOW_CONFIG.keyboardMoveStep;
-        
+        const moveStep = input.shift
+          ? WINDOW_CONFIG.keyboardMoveFastStep
+          : WINDOW_CONFIG.keyboardMoveStep;
+
         // Handle different arrow keys
         switch (input.key) {
           case "ArrowUp":
@@ -280,7 +303,7 @@ class BottomCardWindow {
         }
       }
     });
-    
+
     console.log("⌨️  Keyboard movement handlers setup for BottomCard");
   }
 
@@ -326,19 +349,19 @@ class BottomCardWindow {
    */
   setupIpcHandlers() {
     console.log("🔧 Setting up BottomCard IPC handlers...");
-    
+
     // Screenshot handlers
     this.setupScreenshotHandlers();
-    
+
     // Navigation handlers
     this.setupNavigationHandlers();
-    
+
     // Window control handlers
     this.setupWindowControlHandlers();
-    
+
     // Development handlers
     this.setupDevelopmentHandlers();
-    
+
     console.log("✅ BottomCard IPC handlers registered");
   }
 
@@ -347,12 +370,12 @@ class BottomCardWindow {
    */
   setupScreenshotHandlers() {
     // Manual screenshot sending
-    ipcMain.on("send-screenshot-to-bottomcard", (event, imagePath) => {
+    ipcMain.on("send-screenshot-to-bottomcard", (_event, imagePath) => {
       this.handleManualScreenshot(imagePath);
     });
 
     // Get last screenshot
-    ipcMain.on("get-last-screenshot", (event) => {
+    ipcMain.on("get-last-screenshot", () => {
       this.handleGetLastScreenshot();
     });
   }
@@ -362,14 +385,17 @@ class BottomCardWindow {
    */
   setupNavigationHandlers() {
     // Navigate to URL
-    ipcMain.on("navigate-bottom-card", (event, url) => {
+    ipcMain.on("navigate-bottom-card", (_event, url) => {
       this.safeWindowSend("navigate-to", url);
     });
 
     // Localhost navigation
-    ipcMain.on("navigate-bottomcard-localhost", (event, { port, path = "" }) => {
-      this.handleLocalhostNavigation(port, path);
-    });
+    ipcMain.on(
+      "navigate-bottomcard-localhost",
+      (_event, { port, path = "" }) => {
+        this.handleLocalhostNavigation(port, path);
+      },
+    );
 
     // Reload localhost page
     ipcMain.on("reload-bottomcard-localhost", () => {
@@ -382,7 +408,7 @@ class BottomCardWindow {
     });
 
     // Switch port
-    ipcMain.on("switch-bottomcard-port", (event, newPort) => {
+    ipcMain.on("switch-bottomcard-port", (_event, newPort) => {
       this.handlePortSwitch(newPort);
     });
   }
@@ -445,7 +471,7 @@ class BottomCardWindow {
 
       if (fs.existsSync(imagePath)) {
         this.window.webContents.send("display-screenshot", imagePath);
-        
+
         if (!this.window.isVisible()) {
           this.window.show();
         }
@@ -463,8 +489,11 @@ class BottomCardWindow {
       console.log("📸 Sending last screenshot:", this.lastScreenshotPath);
 
       if (this.window && !this.window.isDestroyed()) {
-        this.window.webContents.send("display-screenshot", this.lastScreenshotPath);
-        
+        this.window.webContents.send(
+          "display-screenshot",
+          this.lastScreenshotPath,
+        );
+
         if (!this.window.isVisible()) {
           this.window.show();
         }
@@ -605,21 +634,6 @@ class BottomCardWindow {
   }
 
   /**
-   * Force show the window (for debugging)
-   */
-  forceShow() {
-    if (this.window && !this.window.isDestroyed()) {
-      this.window.setOpacity(1);
-      this.window.show();
-      this.window.focus();
-      console.log("🔧 BottomCard window force shown for debugging");
-    } else {
-      console.log("🔧 Creating BottomCard window for debugging");
-      this.createWindow();
-    }
-  }
-
-  /**
    * Hide the window without animation (for internal use)
    */
   hideImmediate() {
@@ -645,28 +659,6 @@ class BottomCardWindow {
     return this.window && this.window.isVisible();
   }
 
-  /**
-   * Set window position
-   * @param {number} x - X coordinate
-   * @param {number} y - Y coordinate
-   */
-  setPosition(x, y) {
-    if (this.window) {
-      this.window.setPosition(x, y);
-    }
-  }
-
-  /**
-   * Set window size
-   * @param {number} width - Window width
-   * @param {number} height - Window height
-   */
-  setSize(width, height) {
-    if (this.window) {
-      this.window.setSize(width, height);
-    }
-  }
-
   // =============================================================================
   // KEYBOARD MOVEMENT METHODS
   // =============================================================================
@@ -679,7 +671,7 @@ class BottomCardWindow {
     if (this.window && !this.window.isDestroyed()) {
       const [currentX, currentY] = this.window.getPosition();
       const newY = Math.max(WINDOW_CONFIG.boundaryMargin, currentY - step);
-      
+
       if (newY !== currentY) {
         this.window.setPosition(currentX, newY);
         console.log(`⬆️  BottomCard moved up to: (${currentX}, ${newY})`);
@@ -694,13 +686,13 @@ class BottomCardWindow {
   moveWindowDown(step) {
     if (this.window && !this.window.isDestroyed()) {
       const [currentX, currentY] = this.window.getPosition();
-      const [windowWidth, windowHeight] = this.window.getSize();
+      const [, windowHeight] = this.window.getSize();
       const display = screen.getPrimaryDisplay();
       const { height: screenHeight } = display.workAreaSize;
-      
+
       const maxY = screenHeight - windowHeight - WINDOW_CONFIG.boundaryMargin;
       const newY = Math.min(maxY, currentY + step);
-      
+
       if (newY !== currentY) {
         this.window.setPosition(currentX, newY);
         console.log(`⬇️  BottomCard moved down to: (${currentX}, ${newY})`);
@@ -716,7 +708,7 @@ class BottomCardWindow {
     if (this.window && !this.window.isDestroyed()) {
       const [currentX, currentY] = this.window.getPosition();
       const newX = Math.max(WINDOW_CONFIG.boundaryMargin, currentX - step);
-      
+
       if (newX !== currentX) {
         this.window.setPosition(newX, currentY);
         console.log(`⬅️  BottomCard moved left to: (${newX}, ${currentY})`);
@@ -731,13 +723,13 @@ class BottomCardWindow {
   moveWindowRight(step) {
     if (this.window && !this.window.isDestroyed()) {
       const [currentX, currentY] = this.window.getPosition();
-      const [windowWidth, windowHeight] = this.window.getSize();
+      const [windowWidth] = this.window.getSize();
       const display = screen.getPrimaryDisplay();
       const { width: screenWidth } = display.workAreaSize;
-      
+
       const maxX = screenWidth - windowWidth - WINDOW_CONFIG.boundaryMargin;
       const newX = Math.min(maxX, currentX + step);
-      
+
       if (newX !== currentX) {
         this.window.setPosition(newX, currentY);
         console.log(`➡️  BottomCard moved right to: (${newX}, ${currentY})`);
@@ -756,7 +748,7 @@ class BottomCardWindow {
   displayScreenshot(screenshotPath) {
     if (this.window && !this.window.isDestroyed()) {
       console.log("📸 Displaying screenshot in BottomCard:", screenshotPath);
-      
+
       // Show and focus window immediately (no animation for screenshots)
       this.showImmediate();
 
@@ -774,14 +766,20 @@ class BottomCardWindow {
   sendScreenshotWithTiming(screenshotPath) {
     // Send immediately if already loaded
     if (!this.window.webContents.isLoading()) {
-      console.log("📤 Sending screenshot to BottomCard (already loaded):", screenshotPath);
+      console.log(
+        "📤 Sending screenshot to BottomCard (already loaded):",
+        screenshotPath,
+      );
       this.window.webContents.send("display-screenshot", screenshotPath);
     }
 
     // Also send after a delay to ensure delivery
     setTimeout(() => {
       if (this.window && !this.window.isDestroyed()) {
-        console.log("📤 Sending screenshot to BottomCard (delayed):", screenshotPath);
+        console.log(
+          "📤 Sending screenshot to BottomCard (delayed):",
+          screenshotPath,
+        );
         this.window.webContents.send("display-screenshot", screenshotPath);
       }
     }, WINDOW_CONFIG.screenshotSendDelay);
@@ -810,8 +808,10 @@ class BottomCardWindow {
   toggle() {
     if (this.window && !this.window.isDestroyed()) {
       const isVisible = this.window.isVisible();
-      console.log(`🔍 BottomCard window state: visible=${isVisible}, destroyed=${this.window.isDestroyed()}`);
-      
+      console.log(
+        `🔍 BottomCard window state: visible=${isVisible}, destroyed=${this.window.isDestroyed()}`,
+      );
+
       if (isVisible) {
         console.log("👁️ Hiding BottomCard window via toggle");
         this.window.hide();
@@ -821,11 +821,12 @@ class BottomCardWindow {
         this.window.focus();
       }
     } else {
-      console.log("👁️ Creating BottomCard window via toggle (window doesn't exist or is destroyed)");
+      console.log(
+        "👁️ Creating BottomCard window via toggle (window doesn't exist or is destroyed)",
+      );
       this.createWindow();
     }
   }
-
 }
 
 // =============================================================================
