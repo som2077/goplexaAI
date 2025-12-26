@@ -206,8 +206,8 @@ const Maincard = () => {
                       </div>
                     </div>
                     <span className="text-xs">somgoutam0@gmail.com</span>
-                    <button className="bg-white hover:bg-gray-200 text-black text-xs font-semibold py-1 cursor-pointer px-[10px] rounded-full">
-                      Show
+                    <button className="bg-white hover:bg-gray-200 text-black text-xs  py-1 cursor-pointer px-[10px] rounded-full">
+                      Usage
                     </button>
                   </div>
                 </GlareHover>
