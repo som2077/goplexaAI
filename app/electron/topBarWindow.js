@@ -19,7 +19,7 @@ import { BrowserWindow, screen, ipcMain } from "electron";
 // =============================================================================
 const WINDOW_CONFIG = {
   width: 300,
-  height: 420,
+  height: 520,
   initialTopY: 2, // 2px from top of screen
   centerTopY: 2, // For initial positioning - same as initialTopY
   centerWidth: 300, // Width for center calculation - same as window width
