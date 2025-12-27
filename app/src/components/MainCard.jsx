@@ -79,7 +79,7 @@ const Maincard = () => {
           "Window X:",
           newX,
           "Window Width:",
-          windowWidth
+          windowWidth,
         );
         ipcRenderer.send("topbar-move", { x: newX, y: 0 });
 
@@ -235,7 +235,7 @@ const Maincard = () => {
                     if (window.require) {
                       const { shell } = window.require("electron");
                       shell.openExternal(
-                        "https://github.com/yourusername/gopelxa"
+                        "https://github.com/yourusername/gopelxa",
                       );
                     }
                   }}
@@ -301,17 +301,30 @@ const Maincard = () => {
                   Visit Website
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-white/20 mx-[1px]" />
-                <DropdownMenuItem
-                  className="text-red-400 hover:bg-red-500/20 cursor-pointer"
-                  onClick={() => {
-                    if (window.require) {
-                      const { ipcRenderer } = window.require("electron");
-                      ipcRenderer.send("close-topbar");
-                    }
-                  }}
-                >
-                  Exit
-                </DropdownMenuItem>
+                <div className="flex items-center gap-2">
+                  <DropdownMenuItem
+                    className="text-red-400 hover:bg-red-500/20 cursor-pointer flex-1 flex  justify-center bg-[#121212]/80"
+                    onClick={() => {
+                      if (window.require) {
+                        const { ipcRenderer } = window.require("electron");
+                        ipcRenderer.send("close-topbar");
+                      }
+                    }}
+                  >
+                    Exit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-yellow-400 hover:bg-yellow-500/20 cursor-pointer flex-1 flex  justify-center bg-[#121212]/80"
+                    onClick={() => {
+                      if (window.require) {
+                        const { ipcRenderer } = window.require("electron");
+                        ipcRenderer.send("restart-app");
+                      }
+                    }}
+                  >
+                    Restart
+                  </DropdownMenuItem>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
