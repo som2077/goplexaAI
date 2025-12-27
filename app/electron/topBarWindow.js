@@ -362,7 +362,7 @@ class TopBarWindow {
       console.log(`🖥️ Display info:`);
       console.log(`   - Full screen size: ${screenWidth}x${screenHeight}`);
       console.log(
-        `   - Work area size: ${workAreaWidth}x${display.workAreaSize.height}`
+        `   - Work area size: ${workAreaWidth}x${display.workAreaSize.height}`,
       );
       console.log(`   - Window width: ${windowWidth}`);
       console.log(`   - Desired X: ${x}`);
@@ -376,7 +376,7 @@ class TopBarWindow {
       let constrainedX = this.constrainXPosition(
         x,
         effectiveScreenWidth,
-        windowWidth
+        windowWidth,
       );
 
       // Set position with constraints
@@ -391,7 +391,7 @@ class TopBarWindow {
           constrainedX + windowWidth
         } <= ${effectiveScreenWidth} (${
           constrainedX + windowWidth <= effectiveScreenWidth
-        })`
+        })`,
       );
     });
   }
@@ -407,7 +407,7 @@ class TopBarWindow {
     let constrainedX = x;
 
     console.log(
-      `🔍 Constraint check - Input: x=${x}, screenWidth=${screenWidth}, windowWidth=${windowWidth}`
+      `🔍 Constraint check - Input: x=${x}, screenWidth=${screenWidth}, windowWidth=${windowWidth}`,
     );
 
     // Ensure window doesn't go off the left edge
@@ -422,7 +422,7 @@ class TopBarWindow {
       console.log(
         `➡️ Right constraint applied: ${constrainedX} -> ${newX} (right edge: ${
           newX + windowWidth
-        })`
+        })`,
       );
       constrainedX = newX;
     }
@@ -430,7 +430,7 @@ class TopBarWindow {
     console.log(
       `✅ Final constrained X: ${constrainedX}, right edge: ${
         constrainedX + windowWidth
-      }`
+      }`,
     );
     return constrainedX;
   }
@@ -607,8 +607,8 @@ class TopBarWindow {
       0, // Allow to reach left edge
       Math.min(
         topBarCenterX,
-        screenWidth - WINDOW_CONFIG.width // Allow to reach right edge
-      )
+        screenWidth - WINDOW_CONFIG.width, // Allow to reach right edge
+      ),
     );
 
     return {

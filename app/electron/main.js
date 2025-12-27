@@ -17,7 +17,7 @@ import {
   ipcMain,
   globalShortcut,
 } from "electron";
-import { spawn } from "child_process";
+import { spawn, exec } from "child_process";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
@@ -95,7 +95,7 @@ async function detectVitePort() {
   }
 
   console.log(
-    `⚠️  No Vite dev server found on common ports, using default port ${vitePort}`
+    `⚠️  No Vite dev server found on common ports, using default port ${vitePort}`,
   );
   return vitePort;
 }
@@ -150,7 +150,7 @@ function createBottomCardWindow() {
     bottomCardWindow = new BottomCardWindow(
       APP_CONFIG.iconPath,
       getViteURL,
-      vitePort
+      vitePort,
     );
     bottomCardWindow.createWindow();
     console.log("✅ BottomCard window created successfully");
@@ -398,7 +398,7 @@ function registerGlobalShortcuts() {
       () => {
         try {
           console.log(
-            "⌨️ Global shortcut Ctrl + / pressed - toggling BottomCard"
+            "⌨️ Global shortcut Ctrl + / pressed - toggling BottomCard",
           );
           if (bottomCardWindow && !bottomCardWindow.window?.isDestroyed()) {
             bottomCardWindow.toggle();
@@ -408,7 +408,7 @@ function registerGlobalShortcuts() {
         } catch (error) {
           console.error("❌ Error in global shortcut handler:", error);
         }
-      }
+      },
     );
 
     if (shortcutRegistered) {
@@ -443,6 +443,24 @@ function unregisterGlobalShortcuts() {
 function registerIpcHandlers() {
   // Screenshot handler
   ipcMain.on("trigger-screenshot", handleScreenshotProcess);
+
+  // Restart application handler
+  ipcMain.on("restart-app", () => {
+    console.log("🔄 Restarting application...");
+
+    const appPath = path.join(__dirname, "..");
+
+    // Spawn new electron process
+    const child = spawn(process.execPath, ["."], {
+      cwd: appPath,
+      detached: true,
+      stdio: "ignore",
+    });
+    child.unref();
+
+    // Quit current app
+    app.quit();
+  });
 
   console.log("✅ IPC handlers registered");
 }
