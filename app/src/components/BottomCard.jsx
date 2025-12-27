@@ -336,7 +336,7 @@ const BottomCard = () => {
   return (
     <div
       key={animationKey}
-      className="w-full rounded-[23px] bg-black/60 border border-white/10  animate-fadeIn"
+      className="w-full rounded-[23px] bg-black/80 border border-white/10  animate-fadeIn"
     >
       <div className="flex h-[680px]">
         <div className="flex flex-col flex-1 text-white">
