@@ -23,6 +23,8 @@ const Maincard = () => {
   const isDraggingRef = useRef(false);
   const startXRef = useRef(0);
   const dragAreaRef = useRef(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Main useEffect for setting up event listeners and window dragging
   useEffect(() => {
@@ -122,27 +124,52 @@ const Maincard = () => {
   };
 
   return (
-    <div className="">
+    <div className="flex items-center justify-center p-1">
       <div
         ref={dragAreaRef}
-        className="w-[300px] h-[59px] bg-black/85 flex items-center border border-white/20 rounded-[10px] "
+        className="bg-black/85 flex items-center border border-white/20 rounded-[10px] transition-all duration-500 ease-in-out cursor-pointer overflow-hidden"
+        style={{
+          width: isHovered || isDropdownOpen ? "300px" : "100px",
+          height: isHovered || isDropdownOpen ? "59px" : "8px",
+        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         <div
           className="pointer-events-auto"
           onClick={(e) => e.stopPropagation()}
+          style={{
+            opacity: isHovered || isDropdownOpen ? 1 : 0,
+            transition: "opacity 0.3s",
+          }}
         >
           <New />
         </div>
 
-        <div className="flex items-center ml-2 bg-[#121212]/80 rounded-full focus:outline-none focus:ring-0 active:outline-none transition">
+        <div
+          className="flex items-center ml-2 bg-[#121212]/80 rounded-full focus:outline-none focus:ring-0 active:outline-none transition"
+          style={{
+            opacity: isHovered || isDropdownOpen ? 1 : 0,
+            transition: "opacity 0.3s",
+          }}
+        >
           <AudioWaveform />
         </div>
 
-        <div className="flex items-center ml-[17px] select-none cursor-pointer">
+        <div
+          className="flex items-center ml-[17px] select-none cursor-pointer"
+          style={{
+            opacity: isHovered || isDropdownOpen ? 1 : 0,
+            transition: "opacity 0.3s",
+          }}
+        >
           <div onClick={(e) => e.stopPropagation()}>
-            <DropdownMenu className="shadow-none">
+            <DropdownMenu
+              className="shadow-none"
+              onOpenChange={setIsDropdownOpen}
+            >
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center justify-center cursor-pointer focus:outline-none focus:ring-0 active:outline-none    transition-colors">
+                <button className="flex items-center justify-center cursor-pointer focus:outline-none focus:ring-0 active:outline-none transition-colors">
                   <img
                     src={moreWhiteIcon}
                     alt="More"
@@ -151,7 +178,7 @@ const Maincard = () => {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="bg-black/85 border-white/20 text-white mt-5 w-[274px]  "
+                className="bg-black/85 border-white/20 text-white mt-5 w-[274px]"
                 align="end"
                 sideOffset={5}
               >
