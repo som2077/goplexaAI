@@ -19,8 +19,8 @@ import fs from "fs";
 // CONFIGURATION & CONSTANTS
 // =============================================================================
 const WINDOW_CONFIG = {
-  width: 1100,
-  height: 724,
+  width: 1070,
+  height: 710,
   minWidth: 400,
   minHeight: 300,
   screenMargin: 40,
@@ -83,6 +83,9 @@ class BottomCardWindow {
       const windowOptions = this.calculateWindowOptions();
       this.window = new BrowserWindow(windowOptions);
 
+      // Set window to always be on top of all other windows
+      this.window.setAlwaysOnTop(true, "screen-saver");
+
       this.setupWindowEvents();
       this.loadWindowContent();
 
@@ -130,7 +133,7 @@ class BottomCardWindow {
       frame: false,
       transparent: true,
       hasShadow: true,
-      resizable: false,
+      resizable: true,
       maximizable: false,
       minimizable: false,
       fullscreenable: false,
@@ -202,6 +205,21 @@ class BottomCardWindow {
 
     // Keyboard movement events
     this.setupKeyboardMovement();
+
+    // Ensure always on top when window is shown
+    this.window.on("show", () => {
+      this.window.setAlwaysOnTop(true, "screen-saver");
+      console.log("👁️ BottomCard window shown and set to always on top");
+    });
+
+    // Re-apply always on top when focus changes
+    this.window.on("focus", () => {
+      this.window.setAlwaysOnTop(true, "screen-saver");
+    });
+
+    this.window.on("blur", () => {
+      this.window.setAlwaysOnTop(true, "screen-saver");
+    });
   }
 
   /**
@@ -603,6 +621,7 @@ class BottomCardWindow {
     if (this.window && !this.window.isDestroyed()) {
       this.window.show();
       this.window.focus();
+      this.window.setAlwaysOnTop(true, "screen-saver");
       console.log("👁️ BottomCard window shown");
     } else {
       this.createWindow();
@@ -626,6 +645,7 @@ class BottomCardWindow {
     if (this.window && !this.window.isDestroyed()) {
       this.window.show();
       this.window.focus();
+      this.window.setAlwaysOnTop(true, "screen-saver");
       console.log("👁️ BottomCard window shown immediately (no animation)");
     } else {
       console.log("👁️ Creating BottomCard window immediately");
@@ -819,6 +839,7 @@ class BottomCardWindow {
         console.log("👁️ Showing BottomCard window via toggle");
         this.window.show();
         this.window.focus();
+        this.window.setAlwaysOnTop(true, "screen-saver");
       }
     } else {
       console.log(
