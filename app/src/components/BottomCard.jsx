@@ -55,7 +55,7 @@ const BottomCard = () => {
 
   // Analysis state
   const [analysisText, setAnalysisText] = useState(
-    "Welcome to the screenshot analysis tool. Take a screenshot to get started."
+    "Welcome to the screenshot analysis tool. Take a screenshot to get started.",
   );
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState(null);
@@ -109,7 +109,7 @@ const BottomCard = () => {
 
       const startTime = Date.now();
       console.log(
-        "🚀 Sending request to backend http://localhost:5000/api/analyze"
+        "🚀 Sending request to backend http://localhost:5000/api/analyze",
       );
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
@@ -173,7 +173,7 @@ const BottomCard = () => {
     } catch (error) {
       console.error("❌ Analysis failed:", error);
       setAnalysisError(
-        error.message || "Failed to analyze screenshot. Please try again."
+        error.message || "Failed to analyze screenshot. Please try again.",
       );
     } finally {
       setIsAnalyzing(false);
@@ -206,7 +206,7 @@ const BottomCard = () => {
       try {
         const imageBuffer = fs.readFileSync(path);
         const base64Image = `data:image/png;base64,${imageBuffer.toString(
-          "base64"
+          "base64",
         )}`;
         setDisplayPath(base64Image);
         setImageError(false);
@@ -230,7 +230,7 @@ const BottomCard = () => {
       console.log("BottomCard: Received screenshot path:", receivedPath);
       console.log(
         "BottomCard: Current displayPath before update:",
-        displayPath
+        displayPath,
       );
 
       setImageError(false);
@@ -247,7 +247,7 @@ const BottomCard = () => {
           console.log("BottomCard: Setting display path to:", processed);
         } else {
           console.log(
-            "BottomCard: Failed to process path, setting image error"
+            "BottomCard: Failed to process path, setting image error",
           );
           setImageError(true);
         }
@@ -311,7 +311,7 @@ const BottomCard = () => {
 
     const handleWindowShown = () => {
       console.log(
-        "Window shown - restarting animation and ensuring interactivity"
+        "Window shown - restarting animation and ensuring interactivity",
       );
       setAnimationKey((prev) => prev + 1);
 
@@ -334,11 +334,11 @@ const BottomCard = () => {
   }, []);
 
   return (
-    <div
-      key={animationKey}
-      className="w-full rounded-[23px] bg-black/80 border border-white/10  animate-fadeIn"
-    >
-      <div className="flex h-[680px]">
+    <div className="flex justify-center place-items-center h-screen select-none   ">
+      <div
+        key={animationKey}
+        className="w-[1050px] h-[690px] p-2 rounded-[39px] bg-black/85 border border-white/10 transition-all duration-900 ease-in-out"
+      >
         <div className="flex flex-col flex-1 text-white">
           <Content
             analysisError={analysisError}
@@ -351,11 +351,11 @@ const BottomCard = () => {
             handleImageLoad={handleImageLoad}
             ResponseComponent={Response}
           />
+          {/* <div className="flex opacity-50 justify-center items-center gap-2 text-xs text-gray-400 bg-black">
+            <Kbd>Ctrl</Kbd>
+            <Kbd>/</Kbd>
+          </div> */}
         </div>
-      </div>
-      <div className="flex opacity-50 justify-center items-center gap-2 text-xs mb-3 mt-2 text-gray-400">
-        <Kbd>Ctrl</Kbd>
-        <Kbd>/</Kbd>
       </div>
     </div>
   );
