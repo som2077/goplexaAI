@@ -142,7 +142,7 @@ const Content = ({
           </button>
 
           {/* Transcript Button */}
-          <button className="px-4 py-2 backdrop-blur-lg focus:outline-none focus:ring-0 active:outline-none rounded-full opacity-90 bg-white/10 hover:bg-white/20 flex items-center gap-2 transition-colors -webkit-app-region-no-drag">
+          <button className="px-4 py-2 mr-[3px] backdrop-blur-lg focus:outline-none focus:ring-0 active:outline-none rounded-full opacity-90 bg-white/10 hover:bg-white/20 flex items-center gap-2 transition-colors -webkit-app-region-no-drag">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
