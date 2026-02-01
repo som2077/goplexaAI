@@ -11,10 +11,10 @@
  * - Error handling for image operations
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 // UI Components
-import { Kbd } from "./ui/kbd";
+// import { Kbd } from "./ui/kbd";
 import Content from "./Content";
 import { Response } from "@/components/ui/response";
 
@@ -320,21 +320,21 @@ const BottomCard = () => {
       }, 50);
     };
 
-    const handleWindowHiding = () => {
-      console.log("Window hiding - preparing for next show");
-    };
+    // const handleWindowHiding = () => {
+    //   console.log("Window hiding - preparing for next show");
+    // };
 
     ipcRenderer.on("window-shown", handleWindowShown);
-    ipcRenderer.on("window-hiding", handleWindowHiding);
+    // ipcRenderer.on("window-hiding", handleWindowHiding);
 
     return () => {
       ipcRenderer.removeAllListeners("window-shown");
-      ipcRenderer.removeAllListeners("window-hiding");
+      // ipcRenderer.removeAllListeners("window-hiding");
     };
   }, []);
 
   return (
-    <div className="flex justify-center place-items-center h-screen select-none   ">
+    <div className="flex justify-center place-items-center h-screen select-none">
       <div
         key={animationKey}
         className="w-[1050px] h-[690px] p-2 rounded-[39px] bg-black/85 border border-white/10 transition-all duration-900 ease-in-out"

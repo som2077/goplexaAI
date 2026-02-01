@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Camera, X, Plus, GripVertical } from "lucide-react";
-import { Loader } from "./ai-elements/loader";
-import answerIcon from "../assets/answer.svg";
+import { Camera, X, GripVertical } from "lucide-react";
 
 const Content = ({
   analysisError,
@@ -14,7 +12,6 @@ const Content = ({
   handleImageLoad,
   ResponseComponent,
 }) => {
-  const [activeTab, setActiveTab] = useState("assistant");
   const [showPreview, setShowPreview] = useState(false);
 
   console.log("Content component props:", {
@@ -29,9 +26,6 @@ const Content = ({
     console.log("Content useEffect - imageError changed:", imageError);
     console.log("Content useEffect - screenshotPath changed:", screenshotPath);
   }, [displayPath, imageError, screenshotPath]);
-
-  const contentRef = useRef(null);
-  const currentContent = analysisText || "";
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -81,7 +75,6 @@ const Content = ({
         {/* Left Icons */}
         <div className="flex items-center gap-3">
           {/* Grid Icon */}
-
           <button className="w-10 h-10 backdrop-blur-lg rounded-full focus:outline-none focus:ring-0 active:outline-none -webkit-app-region-drag bg-white/10 opacity-90 flex items-center justify-center transition-colors">
             <GripVertical size={18} />
           </button>
@@ -157,13 +150,8 @@ const Content = ({
       </div>
 
       {/* Content Area */}
-      <div className="justify-center items-center flex mt-1 ">
-        <div
-          ref={contentRef}
-          className="rounded-[18px] p-4 text-gray-200 text-sm leading-relaxed h-[615px] w-[1030px] items-center overflow-y-auto scrollbar-hide scrollbar-track-transparent relative -webkit-app-region-no-drag focus:outline-none focus:ring-0 active:outline-none transition"
-          onMouseDown={(e) => e.stopPropagation()}
-          style={{ userSelect: "text" }}
-        ></div>
+      <div className="justify-center items-center flex rounded-b-[33px]">
+        <div className="rounded-[18px] p- text-gray-200 text-sm leading-relaxed h-[609px]  items-center overflow-y-auto scrollbar-hide scrollbar-track-transparent relative -webkit-app-region-no-drag focus:outline-none focus:ring-0 active:outline-none transition"></div>
       </div>
 
       {/* Screenshot Preview Modal */}
